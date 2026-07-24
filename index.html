@@ -126,9 +126,23 @@
         <span class="section-chevron">▼</span>
       </div>
       <div class="section-body">
-        <input type="text" class="input-field" id="p-favorites" placeholder="Favorites (e.g. Mosin-Nagant, Rival 78)">
-        <input type="text" class="input-field" id="p-dislikes" placeholder="Disliked (e.g. Nitro Express, Bomb Lance)">
-        <input type="text" class="input-field" id="p-exclude" placeholder="Exclude (never include)">
+        <div class="multi-select-group">
+          <div class="multi-select-label">Favorites</div>
+          <div id="favorites-tags" class="multi-tags"></div>
+          <select id="favorites-select" class="multi-select" multiple> </select>
+        </div>
+
+        <div class="multi-select-group">
+          <div class="multi-select-label">Disliked</div>
+          <div id="dislikes-tags" class="multi-tags"></div>
+          <select id="dislikes-select" class="multi-select" multiple> </select>
+        </div>
+
+        <div class="multi-select-group">
+          <div class="multi-select-label">Exclude</div>
+          <div id="exclude-tags" class="multi-tags"></div>
+          <select id="exclude-select" class="multi-select" multiple> </select>
+        </div>
       </div>
     </div>
   </aside>

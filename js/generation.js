@@ -16,10 +16,67 @@ function parseList(v) {
     .filter(Boolean);
 }
 
+// Match helpers for dropdown-based favorites/dislikes/exclude
+
+function matchesWeapon(name, token) {
+  if (!token) return false;
+  const n = name.toLowerCase();
+  if (token.startsWith('weapon:')) {
+    const target = token.slice(7).toLowerCase();
+    return n === target;
+  }
+  if (token.startsWith('family:')) {
+    const target = token.slice(7).toLowerCase();
+    return n.includes(target);
+  }
+  if (token.startsWith('type:')) {
+    const t = token.slice(5);
+    switch (t) {
+      case 'scoped': return name.toLowerCase().includes('silencer') || name.toLowerCase().includes('marksman') || name.toLowerCase().includes('deadeye') || name.toLowerCase().includes('sniper') || name.toLowerCase().includes('aperture') || name.toLowerCase().includes('bullseye') || name.toLowerCase().includes('precision');
+      case 'auto': return name.toLowerCase().includes('auto') || name.toLowerCase().includes('avtomat') || name.toLowerCase().includes('cyclone') || name.toLowerCase().includes('swift');
+      case 'silencer': return name.toLowerCase().includes('silencer');
+      case 'melee': return name.toLowerCase().includes('bat') || name.toLowerCase().includes('machete') || name.toLowerCase().includes('katana') || name.toLowerCase().includes('saber') || name.toLowerCase().includes('axe') || name.toLowerCase().includes('hammer');
+      case 'shotgun': return name.toLowerCase().includes('shotgun') || name.toLowerCase().includes('rival 78') || name.toLowerCase().includes('romero 77') || name.toLowerCase().includes('terminus') || name.toLowerCase().includes('specter 1882') || name.toLowerCase().includes('slate') || name.toLowerCase().includes('auto-5');
+      case 'long-range': return name.length > 3; // handled via size in data; we'll approximate by size check elsewhere
+      case 'crossbow': return name.toLowerCase().includes('crossbow') || name.toLowerCase().includes('bow');
+      default: return false;
+    }
+  }
+  // Fallback: substring
+  return n.includes(token.toLowerCase());
+}
+
 function matchesExclude(name, excludes) {
   if (!excludes.length) return false;
   const n = name.toLowerCase();
-  return excludes.some(e => n.includes(e));
+  return excludes.some(e => {
+    if (e.startsWith('weapon:')) return n === e.slice(7).toLowerCase();
+    if (e.startsWith('family:')) return n.includes(e.slice(7).toLowerCase());
+    if (e.startsWith('type:')) {
+      const t = e.slice(5);
+      switch (t) {
+        case 'scoped': return name.toLowerCase().includes('silencer') || name.toLowerCase().includes('marksman') || name.toLowerCase().includes('deadeye') || name.toLowerCase().includes('sniper') || name.toLowerCase().includes('aperture') || name.toLowerCase().includes('bullseye') || name.toLowerCase().includes('precision');
+        case 'auto': return name.toLowerCase().includes('auto') || name.toLowerCase().includes('avtomat') || name.toLowerCase().includes('cyclone') || name.toLowerCase().includes('swift');
+        case 'silencer': return name.toLowerCase().includes('silencer');
+        case 'melee': return name.toLowerCase().includes('bat') || name.toLowerCase().includes('machete') || name.toLowerCase().includes('katana') || name.toLowerCase().includes('saber') || name.toLowerCase().includes('axe') || name.toLowerCase().includes('hammer');
+        case 'shotgun': return name.toLowerCase().includes('shotgun') || name.toLowerCase().includes('rival 78') || name.toLowerCase().includes('romero 77') || name.toLowerCase().includes('terminus') || name.toLowerCase().includes('specter 1882') || name.toLowerCase().includes('slate') || name.toLowerCase().includes('auto-5');
+        case 'long-range': return name.length > 3;
+        case 'crossbow': return name.toLowerCase().includes('crossbow') || name.toLowerCase().includes('bow');
+        default: return n.includes(e.toLowerCase());
+      }
+    }
+    return n.includes(e.toLowerCase());
+  });
+}
+
+function isFavorited(w, favs) {
+  if (!favs.length) return false;
+  return favs.some(token => matchesWeapon(w.name, token));
+}
+
+function isDisliked(w, dis) {
+  if (!dis.length) return false;
+  return dis.some(token => matchesWeapon(w.name, token));
 }
 
 function weightedPick(items, weightFn) {
@@ -62,9 +119,9 @@ function readPreferences() {
 
   const synergy = document.getElementById('p-synergy').checked;
 
-  const favorites = parseList(document.getElementById('p-favorites').value);
-  const dislikes = parseList(document.getElementById('p-dislikes').value);
-  const excludes = parseList(document.getElementById('p-exclude').value);
+  const favorites = getFavoritesSelections();
+  const dislikes = getDislikesSelections();
+  const excludes = getExcludeSelections();
 
   return {
     capacity,
@@ -84,8 +141,8 @@ function buildWeaponWeights(prefs) {
   function weightPrimary(w) {
     let weight = 1;
 
-    if (favorites.some(f => w.name.toLowerCase().includes(f))) weight *= 15;
-    if (dislikes.some(d => w.name.toLowerCase().includes(d))) weight *= 0.02;
+    if (isFavorited(w, favorites)) weight *= 15;
+    if (isDisliked(w, dislikes)) weight *= 0.02;
 
     if (pScope && w.scoped) weight *= 4;
     if (pScope && !w.scoped) weight *= 0.4;
@@ -125,8 +182,8 @@ function buildWeaponWeights(prefs) {
   function weightSecondary(w, primary) {
     let weight = 1;
 
-    if (favorites.some(f => w.name.toLowerCase().includes(f))) weight *= 15;
-    if (dislikes.some(d => w.name.toLowerCase().includes(d))) weight *= 0.02;
+    if (isFavorited(w, favorites)) weight *= 15;
+    if (isDisliked(w, dislikes)) weight *= 0.02;
 
     if (prefs.sShotgun && w.category === 'shotgun') weight *= 4;
     if (prefs.sPistol && (w.category === 'pistol' || w.category === 'melee')) weight *= 1.5;
