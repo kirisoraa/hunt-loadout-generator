@@ -471,8 +471,8 @@ input[type="range"]::-webkit-slider-thumb {
 
 .weapon-role {
   font-family: var(--font-heading);
-  font-size: 0.52rem;
-  letter-spacing: 0.22em;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 4px;
@@ -480,11 +480,11 @@ input[type="range"]::-webkit-slider-thumb {
 
 .weapon-name {
   font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.88rem;
+  font-weight: 700;
+  font-size: 1.15rem;
   color: var(--text);
   margin-bottom: 6px;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 .weapon-tags {
@@ -494,8 +494,8 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .tag {
-  font-size: 0.58rem;
-  padding: 1px 6px;
+  font-size: 0.68rem;
+  padding: 2px 7px;
   border-radius: 99px;
   border: 1px solid var(--border-soft);
   color: var(--text-muted);
@@ -1163,42 +1163,7 @@ function generateLoadout(){
     equipment.push(item);
   }
 
-  const note=generateLoadoutNote(primary,secondary,equipment,playstyle);
-  renderLoadout(primary,secondary,equipment,capacity,note);
-}
-
-function generateLoadoutNote(primary,secondary,equipment,playstyle){
-  const hasType=(t)=>equipment.some(i=>i.type===t);
-  const isLongPrimary=primary.size>=4&&(primary.scoped||primary.ammo==='Special Long'||primary.ammo==='Long');
-  const isShotgunPrimary=primary.category==='shotgun';
-  const isSpecialPrimary=primary.category==='special';
-  const isCloseSecondary=secondary.size<=2||(secondary.category==='pistol'||secondary.category==='melee');
-
-  if(playstyle==='sniper'&&isLongPrimary&&isCloseSecondary){
-    return "Sniper with a close-range backup. Great for holding angles and surviving pushers.";
-  }
-  if(playstyle==='aggressive'&&isShotgunPrimary){
-    return "Aggressive shotgun rush loadout. You want to be in their face.";
-  }
-  if(playstyle==='stealth'){
-    return "Stealth-oriented: quiet movement, ambush potential, and tools to clear AI unseen.";
-  }
-  if(playstyle==='weird'){
-    return "Weird, high-risk, high-reward build. Fun if you like chaos.";
-  }
-  if(isLongPrimary&&isCloseSecondary){
-    return "Long-range primary with a tight-range backup. Solid for PvPvE flexibility.";
-  }
-  if(isShotgunPrimary){
-    return "Shotgun-focused. Built to own compounds and doorways.";
-  }
-  if(isSpecialPrimary){
-    return "Special-weapon centric. Unconventional but strong in the right hands.";
-  }
-  if(hasType('healing')&&hasType('explosive')){
-    return "Balanced loadout with healing and explosives. Reliable and flexible.";
-  }
-  return "Decent, flexible loadout. Adjust filters to steer it closer to your style.";
+  renderLoadout(primary,secondary,equipment,capacity);
 }
 
 function renderEmpty(msg){
@@ -1206,7 +1171,7 @@ function renderEmpty(msg){
   container.innerHTML=`<div class="loadout-empty">${msg}</div>`;
 }
 
-function renderLoadout(primary,secondary,equipment,capacity,note){
+function renderLoadout(primary,secondary,equipment,capacity){
   const used=primary.size+secondary.size;
   const container=$('#loadoutContainer');
   const tag=(label,cls)=>`<span class="tag ${cls}">${label}</span>`;
@@ -1230,21 +1195,6 @@ function renderLoadout(primary,secondary,equipment,capacity,note){
     return `<div class="equip-item">${item.name}${extra}</div>`;
   }).join('');
 
-  const noteHTML=note?`
-    <div style="
-      margin-top:6px;
-      padding:8px 10px;
-      font-family:var(--font-flavor);
-      font-style:italic;
-      font-size:0.78rem;
-      color:var(--text-muted);
-      border:1px solid var(--border-soft);
-      border-radius:4px;
-      background:var(--bg-card);
-    ">
-      ${note}
-    </div>`:'';
-
   container.innerHTML=`
     <div class="loadout-header">
       <div class="loadout-header-title">Generated Loadout</div>
@@ -1257,8 +1207,7 @@ function renderLoadout(primary,secondary,equipment,capacity,note){
     <div class="equip-section">
       <div class="equip-title">Equipment (${equipment.length})</div>
       <div class="equip-grid">${equipHTML}</div>
-    </div>
-    ${noteHTML}`;
+    </div>`;
 }
 
 function toggleSection(id){
