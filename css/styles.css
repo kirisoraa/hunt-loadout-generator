@@ -505,6 +505,19 @@ input[type="range"]::-webkit-slider-thumb {
   border-color: rgba(165,50,50,0.25);
 }
 
+/* Lock button */
+.lock-btn {
+  cursor: pointer;
+  font-size: 0.72rem;
+  opacity: 0.7;
+  user-select: none;
+  transition: opacity 0.15s;
+}
+
+.lock-btn:hover {
+  opacity: 1;
+}
+
 /* Equipment section */
 .equip-section {
   background: var(--bg-card);

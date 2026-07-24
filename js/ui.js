@@ -13,6 +13,9 @@ function renderEmpty(msg) {
   container.innerHTML = `<div class="loadout-empty">${msg}</div>`;
 }
 
+let lockedPrimaryName = null;
+let lockedSecondaryName = null;
+
 function renderLoadout(primary, secondary, equipment, capacity) {
   const used = primary.size + secondary.size;
   const container = $('#loadoutContainer');
@@ -20,7 +23,10 @@ function renderLoadout(primary, secondary, equipment, capacity) {
   const tag = (label, cls) =>
     `<span class="tag ${cls}">${label}</span>`;
 
-  function weaponCard(w, role, cls) {
+  function weaponCard(w, role, cls, lockKey) {
+    const locked = (lockKey === 'primary' && lockedPrimaryName === w.name) ||
+                   (lockKey === 'secondary' && lockedSecondaryName === w.name);
+    const lockIcon = locked ? '🔒' : '🔓';
     return `
       <div class="weapon-card ${cls}">
         <div class="weapon-role">${role}</div>
@@ -31,6 +37,7 @@ function renderLoadout(primary, secondary, equipment, capacity) {
           ${w.scoped ? tag('Scoped', '') : ''}
           ${w.auto ? tag('Auto', '') : ''}
           ${w.scarce ? tag('Scarce', 'special') : ''}
+          <span class="lock-btn" data-role="${lockKey}" title="Lock/Unlock this weapon">${lockIcon}</span>
         </div>
       </div>`;
   }
@@ -51,13 +58,33 @@ function renderLoadout(primary, secondary, equipment, capacity) {
       <div class="capacity-badge">${used}/${capacity}</div>
     </div>
     <div class="weapons-row">
-      ${weaponCard(primary, 'Primary Weapon', 'primary')}
-      ${weaponCard(secondary, 'Secondary Weapon', 'secondary')}
+      ${weaponCard(primary, 'Primary Weapon', 'primary', 'primary')}
+      ${weaponCard(secondary, 'Secondary Weapon', 'secondary', 'secondary')}
     </div>
     <div class="equip-section">
       <div class="equip-title">Equipment (${equipment.length})</div>
       <div class="equip-grid">${equipHTML}</div>
     </div>`;
+
+  // Wire lock buttons
+  container.querySelectorAll('.lock-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const role = btn.dataset.role;
+      const card = btn.closest('.weapon-card');
+      const name = card.querySelector('.weapon-name').textContent.trim();
+
+      if (role === 'primary') {
+        lockedPrimaryName = (lockedPrimaryName === name) ? null : name;
+      } else {
+        lockedSecondaryName = (lockedSecondaryName === name) ? null : name;
+      }
+
+      // Update icon immediately
+      const isLocked = (role === 'primary' && lockedPrimaryName === name) ||
+                       (role === 'secondary' && lockedSecondaryName === name);
+      btn.textContent = isLocked ? '🔒' : '🔓';
+    });
+  });
 }
 
 function toggleSection(id) {

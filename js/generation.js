@@ -337,32 +337,78 @@ function buildEquipmentConfig(prefs) {
   return { allEquip, usedNames, pickFrom };
 }
 
+function findWeaponByName(name) {
+  return WEAPONS.find(w => w.name === name) || null;
+}
+
 function generateLoadout() {
   const prefs = readPreferences();
   const { filterPrimary, filterSecondary } = buildWeaponFilters(prefs);
   const { weightPrimary, weightSecondary } = buildWeaponWeights(prefs);
 
-  const MAX_ATTEMPTS = 40;
-  let primary = null, secondary = null;
+  const MAX_ATTEMPTS = 60;
+  let primary = null;
+  let secondary = null;
 
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const primaryCandidates = WEAPONS.filter(filterPrimary);
-    if (!primaryCandidates.length) {
-      renderEmpty("No valid primary weapon for current filters. Try relaxing some.");
+  const lockedP = findWeaponByName(lockedPrimaryName);
+  const lockedS = findWeaponByName(lockedSecondaryName);
+
+  const primaryLocked = !!lockedP;
+  const secondaryLocked = !!lockedS;
+
+  // If both locked, just re-render with same weapons (equipment still can be rerolled if desired; for now keep same)
+  if (primaryLocked && secondaryLocked) {
+    if (lockedP.size + lockedS.size > prefs.capacity) {
+      renderEmpty("Locked weapons exceed capacity. Unlock one or enable Quartermaster.");
       return;
     }
+    primary = lockedP;
+    secondary = lockedS;
+  } else if (primaryLocked) {
+    // Use locked primary, roll secondary
+    primary = lockedP;
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const candidates = WEAPONS.filter(w => filterSecondary(w, primary));
+      if (!candidates.length) break;
+      secondary = weightedPick(candidates, w => weightSecondary(w, primary));
+      if (secondary) break;
+    }
+  } else if (secondaryLocked) {
+    // Use locked secondary, roll primary
+    secondary = lockedS;
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const candidates = WEAPONS.filter(w => {
+        if (!filterPrimary(w)) return false;
+        if (w.name === secondary.name) return false;
+        const remaining = prefs.capacity - secondary.size;
+        if (w.size > remaining) return false;
+        return true;
+      });
+      if (!candidates.length) break;
+      primary = weightedPick(candidates, w => weightPrimary(w));
+      if (primary) break;
+    }
+  } else {
+    // Normal: roll both
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const primaryCandidates = WEAPONS.filter(filterPrimary);
+      if (!primaryCandidates.length) {
+        renderEmpty("No valid primary weapon for current filters. Try relaxing some.");
+        return;
+      }
 
-    primary = weightedPick(primaryCandidates, w => weightPrimary(w));
+      primary = weightedPick(primaryCandidates, w => weightPrimary(w));
 
-    const secondaryCandidates = WEAPONS.filter(w => filterSecondary(w, primary));
-    if (!secondaryCandidates.length) continue;
+      const secondaryCandidates = WEAPONS.filter(w => filterSecondary(w, primary));
+      if (!secondaryCandidates.length) continue;
 
-    secondary = weightedPick(secondaryCandidates, w => weightSecondary(w, primary));
-    if (secondary) break;
+      secondary = weightedPick(secondaryCandidates, w => weightSecondary(w, primary));
+      if (secondary) break;
+    }
   }
 
   if (!primary || !secondary) {
-    renderEmpty("No valid weapon combination found. Try relaxing some filters.");
+    renderEmpty("No valid weapon combination found. Try relaxing some filters or unlock a weapon.");
     return;
   }
 
