@@ -37,8 +37,8 @@ function renderLoadout(primary, secondary, equipment, capacity) {
           ${w.scoped ? tag('Scoped', '') : ''}
           ${w.auto ? tag('Auto', '') : ''}
           ${w.scarce ? tag('Scarce', 'special') : ''}
-          <span class="lock-btn" data-role="${lockKey}" title="Lock/Unlock this weapon">${lockIcon}</span>
         </div>
+        <button class="lock-btn" data-role="${lockKey}" title="Lock/Unlock this weapon">${lockIcon}</button>
       </div>`;
   }
 
