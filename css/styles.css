@@ -508,11 +508,11 @@ input[type="range"]::-webkit-slider-thumb {
 /* Lock button: top-right of weapon card */
 .lock-btn {
   position: absolute;
-  top: 8px;
-  right: 9px;
+  top: 7px;
+  right: 8px;
   width: 34px;
   height: 34px;
-  font-size: 1.2rem;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -526,6 +526,11 @@ input[type="range"]::-webkit-slider-thumb {
   transition: all 0.15s;
 }
 
+.lock-icon {
+  width: 16px;
+  height: 16px;
+}
+
 .lock-btn:hover {
   opacity: 1;
   border-color: var(--gold-dim);
@@ -536,7 +541,10 @@ input[type="range"]::-webkit-slider-thumb {
   .lock-btn {
     width: 38px;
     height: 38px;
-    font-size: 1.35rem;
+  }
+  .lock-icon {
+    width: 18px;
+    height: 18px;
   }
 }
 

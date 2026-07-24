@@ -26,7 +26,18 @@ function renderLoadout(primary, secondary, equipment, capacity) {
   function weaponCard(w, role, cls, lockKey) {
     const locked = (lockKey === 'primary' && lockedPrimaryName === w.name) ||
                    (lockKey === 'secondary' && lockedSecondaryName === w.name);
-    const lockIcon = locked ? '🔒' : '🔓';
+
+    const lockIconSVG = locked
+      ? `<svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+           <circle cx="12" cy="16" r="1"></circle>
+         </svg>`
+      : `<svg class="lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+           <path d="M7 11V7a5 5 0 0 1 9.9-1"></path>
+         </svg>`;
+
     return `
       <div class="weapon-card ${cls}">
         <div class="weapon-role">${role}</div>
@@ -38,7 +49,7 @@ function renderLoadout(primary, secondary, equipment, capacity) {
           ${w.auto ? tag('Auto', '') : ''}
           ${w.scarce ? tag('Scarce', 'special') : ''}
         </div>
-        <button class="lock-btn" data-role="${lockKey}" title="Lock/Unlock this weapon">${lockIcon}</button>
+        <button class="lock-btn" data-role="${lockKey}" title="Lock/Unlock this weapon">${lockIconSVG}</button>
       </div>`;
   }
 
