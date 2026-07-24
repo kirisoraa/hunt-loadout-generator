@@ -107,6 +107,7 @@ function readPreferences() {
   const sPistol = document.getElementById('s-pistol').checked;
   const sShotgun = document.getElementById('s-shotgun').checked;
 
+  const equipEnabled = document.getElementById('p-equip-enabled').checked;
   const equipCount = parseInt(document.getElementById('p-equip-count').value);
 
   const eHealing = document.getElementById('e-healing').checked;
@@ -128,6 +129,7 @@ function readPreferences() {
     playstyle,
     pSizes, pAmmos, pScope, pAuto, pScarce,
     sSizes, sAmmos, sPistol, sShotgun,
+    equipEnabled,
     equipCount,
     eHealing, eExplosives, eTraps, eFire, eThrowables, eShots, eTarot,
     synergy,
@@ -413,49 +415,51 @@ function generateLoadout() {
   }
 
   // Equipment selection
-  const { allEquip, pickFrom } = buildEquipmentConfig(prefs);
-  const {
-    eHealing, eExplosives, eTraps, eFire, eThrowables, eShots, eTarot, equipCount
-  } = prefs;
-
   const equipment = [];
 
-  if (eHealing) {
-    const h = pickFrom(allEquip, 'healing');
-    if (h) equipment.push(h);
-  }
-  if (eExplosives) {
-    const e = pickFrom(allEquip, 'explosive');
-    if (e) equipment.push(e);
-  }
-  if (eTraps) {
-    const t = pickFrom(allEquip, 'trap');
-    if (t) equipment.push(t);
-  }
-  if (eFire) {
-    const f = pickFrom(allEquip, 'fire');
-    if (f) equipment.push(f);
-  }
-  if (eThrowables) {
-    const th = pickFrom(allEquip, 'throwable');
-    if (th) equipment.push(th);
-  }
-  if (eShots) {
-    const s = pickFrom(allEquip, 'shot');
-    if (s) equipment.push(s);
-  }
-  if (eTarot) {
-    const card = TAROT_CARDS[Math.floor(Math.random() * TAROT_CARDS.length)];
-    const tarotItem = { name: card, type: "tarot" };
-    if (!prefs.excludes.some(e => card.toLowerCase().includes(e))) {
-      equipment.push(tarotItem);
-    }
-  }
+  if (prefs.equipEnabled) {
+    const { allEquip, pickFrom } = buildEquipmentConfig(prefs);
+    const {
+      eHealing, eExplosives, eTraps, eFire, eThrowables, eShots, eTarot, equipCount
+    } = prefs;
 
-  while (equipment.length < equipCount) {
-    const item = pickFrom(allEquip);
-    if (!item) break;
-    equipment.push(item);
+    if (eHealing) {
+      const h = pickFrom(allEquip, 'healing');
+      if (h) equipment.push(h);
+    }
+    if (eExplosives) {
+      const e = pickFrom(allEquip, 'explosive');
+      if (e) equipment.push(e);
+    }
+    if (eTraps) {
+      const t = pickFrom(allEquip, 'trap');
+      if (t) equipment.push(t);
+    }
+    if (eFire) {
+      const f = pickFrom(allEquip, 'fire');
+      if (f) equipment.push(f);
+    }
+    if (eThrowables) {
+      const th = pickFrom(allEquip, 'throwable');
+      if (th) equipment.push(th);
+    }
+    if (eShots) {
+      const s = pickFrom(allEquip, 'shot');
+      if (s) equipment.push(s);
+    }
+    if (eTarot) {
+      const card = TAROT_CARDS[Math.floor(Math.random() * TAROT_CARDS.length)];
+      const tarotItem = { name: card, type: "tarot" };
+      if (!prefs.excludes.some(e => card.toLowerCase().includes(e))) {
+        equipment.push(tarotItem);
+      }
+    }
+
+    while (equipment.length < equipCount) {
+      const item = pickFrom(allEquip);
+      if (!item) break;
+      equipment.push(item);
+    }
   }
 
   renderLoadout(primary, secondary, equipment, prefs.capacity);
