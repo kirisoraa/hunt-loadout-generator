@@ -52,6 +52,8 @@ function renderLoadout(primary, secondary, equipment, capacity) {
     })
     .join('');
 
+  const showEquipment = equipment.length > 0;
+
   container.innerHTML = `
     <div class="loadout-header">
       <div class="loadout-header-title">Generated Loadout</div>
@@ -61,10 +63,11 @@ function renderLoadout(primary, secondary, equipment, capacity) {
       ${weaponCard(primary, 'Primary Weapon', 'primary', 'primary')}
       ${weaponCard(secondary, 'Secondary Weapon', 'secondary', 'secondary')}
     </div>
+    ${showEquipment ? `
     <div class="equip-section">
       <div class="equip-title">Equipment (${equipment.length})</div>
       <div class="equip-grid">${equipHTML}</div>
-    </div>`;
+    </div>` : ''}`;
 
   // Wire lock buttons
   container.querySelectorAll('.lock-btn').forEach(btn => {
