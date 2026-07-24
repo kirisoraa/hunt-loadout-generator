@@ -508,14 +508,32 @@ input[type="range"]::-webkit-slider-thumb {
 /* Lock button */
 .lock-btn {
   cursor: pointer;
-  font-size: 0.72rem;
-  opacity: 0.7;
+  font-size: 1.15rem;
+  padding: 4px 6px;
+  margin-left: 4px;
+  opacity: 0.85;
   user-select: none;
-  transition: opacity 0.15s;
+  border-radius: 99px;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-deep);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
 }
 
 .lock-btn:hover {
   opacity: 1;
+  border-color: var(--gold-dim);
+}
+
+@media (max-width: 900px) {
+  .lock-btn {
+    font-size: 1.35rem;
+    padding: 6px 9px;
+    min-width: 36px;
+    min-height: 36px;
+  }
 }
 
 /* Equipment section */
