@@ -13,7 +13,7 @@ Features:
 
 Usage:
 - Open index.html in your browser.
+- Adjust preferences on the left, then hit ROLL.
 
 Disclaimer:
 This project was shamelessly vibecoded as a test of my workflow with pi-coding-agent and qwen3.6-27b. with love:)
-- Adjust preferences on the left, then hit ROLL.
